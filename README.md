@@ -34,10 +34,9 @@ cd HTTPS-FileServer
  
 步骤3：启动服务
  
-bash
-  
+```bash
 python main.py
- 
+```
  
 步骤4：局域网访问
  
