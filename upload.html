@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<!-- 移动端核心适配 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>文件上传（局域网专用）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+body{background:#f0f4ff;min-height:100vh;padding:20px 14px;}
+.wrap{max-width:620px;margin:0 auto;}
+.card{background:#fff;border-radius:16px;padding:26px 20px;box-shadow:0 4px 18px rgba(37,99,235,0.12)}
+h1{text-align:center;color:#1d4ed8;font-size:24px;margin-bottom:20px}
+.tip-box{background:#fff3cd;border:1px solid #ffd384;border-radius:10px;padding:14px;margin-bottom:22px;color:#92400e;line-height:1.7}
+.form-area{border:2px dashed #93c5fd;border-radius:12px;padding:40px 16px;text-align:center;margin-bottom:20px}
+.form-area:hover{background:#eff6ff}
+#file-input{display:none}
+.select-btn{background:#2563eb;color:#fff;border:none;border-radius:10px;padding:15px 32px;font-size:16px;cursor:pointer;margin-bottom:14px;width:100%;}
+.upload-btn{background:#16a34a;color:#fff;border:none;border-radius:10px;padding:15px 32px;font-size:16px;cursor:pointer;width:100%}
+.upload-btn:disabled{background:#9ca3af;cursor:not-allowed}
+.file-name{margin:12px 0;color:#333;font-size:15px;word-break:break-all}
+.progress-wrap{height:8px;background:#e5e7eb;border-radius:4px;margin:18px 0;display:none}
+.progress-bar{height:100%;width:0%;background:#2563eb;border-radius:4px;transition:0.2s}
+.result-box{margin-top:20px;padding:16px;border-radius:10px;display:none;word-break:break-all;line-height:1.8}
+.success{background:#dcfce7;color:#15803d;border:1px solid #86efac}
+.error{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}
+.link-row{margin-top:16px;text-align:center}
+a{color:#2563eb}
+@media (max-width:480px){
+    h1{font-size:21px}
+    .card{padding:20px 16px}
+    .form-area{padding:30px 12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card">
+        <h1>📤 文件上传工具</h1>
+        <div class="tip-box">
+            <strong>上传须知</strong><br>
+            1. 仅同一局域网手机/电脑可上传，本机127.0.0.1禁止提交<br>
+            2. 单文件最大 10MB，禁止 exe/bat/sh/dll 等可执行程序<br>
+            3. 上传文件自动存入 /uploaded 文件夹，同名自动加时间戳防覆盖
+        </div>
+        <div class="form-area" id="dropZone">
+            <input type="file" id="file-input" name="file">
+            <button class="select-btn" onclick="document.getElementById('file-input').click()">选择本地文件</button>
+            <div class="file-name" id="fileName">未选择文件</div>
+        </div>
+        <div class="progress-wrap">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <button class="upload-btn" id="uploadBtn" disabled>立即上传</button>
+        <div class="result-box" id="resultBox"></div>
+        <div class="link-row" style="margin-top:24px;">
+            <a href="/uploaded">浏览已上传文件</a>
+            &nbsp;|&nbsp;
+            <a href="/api/status">查看服务状态</a>
+            &nbsp;|&nbsp;
+            <a href="/">返回根目录</a>
+        </div>
+    </div>
+</div>
+
+<script>
+const fileInput = document.getElementById('file-input');
+const fileName = document.getElementById('fileName');
+const uploadBtn = document.getElementById('uploadBtn');
+const progressWrap = document.querySelector('.progress-wrap');
+const progressBar = document.getElementById('progressBar');
+const resultBox = document.getElementById('resultBox');
+const dropZone = document.getElementById('dropZone');
+let selectedFile = null;
+
+// 选择文件监听
+fileInput.addEventListener('change', e=>{
+    selectedFile = e.target.files[0];
+    if(selectedFile){
+        fileName.textContent = selectedFile.name;
+        uploadBtn.disabled = false;
+    }else{
+        fileName.textContent = "未选择文件";
+        uploadBtn.disabled = true;
+    }
+    resultBox.style.display = 'none';
+    progressWrap.style.display = 'none';
+});
+
+// 拖拽上传支持
+['dragenter','dragover','dragleave','drop'].forEach(ev=>{
+    dropZone.addEventListener(ev, e=>e.preventDefault())
+})
+['dragenter','dragover'].forEach(ev=>{
+    dropZone.addEventListener(ev, ()=>dropZone.style.background="#dbeafe")
+})
+['dragleave','drop'].forEach(ev=>{
+    dropZone.addEventListener(ev, ()=>dropZone.style.background="transparent")
+})
+dropZone.addEventListener('drop', e=>{
+    const f = e.dataTransfer.files[0];
+    if(f){
+        fileInput.files = e.dataTransfer.files;
+        selectedFile = f;
+        fileName.textContent = f.name;
+        uploadBtn.disabled = false;
+        resultBox.style.display = 'none';
+        progressWrap.style.display = 'none';
+    }
+})
+
+// 上传提交
+uploadBtn.addEventListener('click', async ()=>{
+    if(!selectedFile) return;
+    const fd = new FormData();
+    fd.append('file', selectedFile);
+    progressWrap.style.display = 'block';
+    progressBar.style.width = '0%';
+    uploadBtn.disabled = true;
+    resultBox.style.display = 'none';
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST','/upload');
+    xhr.upload.onprogress = evt=>{
+        if(evt.lengthComputable){
+            const pct = Math.round((evt.loaded / evt.total)*100);
+            progressBar.style.width = pct+'%';
+        }
+    }
+    xhr.onload = ()=>{
+        try{
+            const res = JSON.parse(xhr.responseText);
+            if(res.code === 0){
+                resultBox.className = 'result-box success';
+                resultBox.innerHTML = `✅ ${res.msg}<br>原始文件名：${res.original_name}<br>保存文件名：${res.saved_name}<br>访问地址：<a href="${res.web_url}" target="_blank">${res.web_url}</a>`;
+            }else{
+                resultBox.className = 'result-box error';
+                resultBox.textContent = `❌ 上传失败：${res.msg}`;
+            }
+        }catch(err){
+            resultBox.className = 'result-box error';
+            resultBox.textContent = '服务器返回数据解析失败';
+        }
+        resultBox.style.display = 'block';
+        uploadBtn.disabled = false;
+    }
+    xhr.onerror = ()=>{
+        resultBox.className = 'result-box error';
+        resultBox.textContent = '网络请求失败，请检查服务器';
+        resultBox.style.display = 'block';
+        uploadBtn.disabled = false;
+    }
+    xhr.send(fd);
+})
+</script>
+</body>
+</html>
