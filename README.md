@@ -4,15 +4,15 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
 ![Auto-SSL](https://img.shields.io/badge/SSL-Auto%20Generate-success)
-![Version](https://img.shields.io/badge/Version-v6.5-Inline)
+![Version](https://img.shields.io/badge/Version-v1.0-Inline)
 
 
 轻量、安全、开箱即用的**纯 Python 局域网 HTTPS 文件服务**。  
-无 OpenSSL 依赖、无需静态页面、单文件部署、自动生成 SSL 证书，适合内网设备互传、资源托管、私有文件共享。
+无 OpenSSL 依赖、无需额外配置、快速部署、自动生成 SSL 证书，适合内网设备互传、资源托管、私有文件共享。
 
 ## ✨ 项目亮点
 
-- **全自动 SSL 证书**：基于 `cryptography` 纯代码生成，跨平台零依赖，启动即用
+- **全自动 SSL 证书**：基于 `cryptography` 纯代码生成，跨平台，启动即用
 - **全站 HTTPS 加密**：禁用明文 HTTP，仅保留高强度 TLS 加密，内网传输安全
 - **单文件极简部署**：所有前端页面内嵌代码，仓库干净无冗余静态文件
 - **分级权限控制**：本机回环 IP 只读，局域网设备可上传/删除，安全隔离
@@ -24,7 +24,9 @@
 
 ```
 HTTPS-FileServer/
-├── main.py        # 主程序（后端逻辑 + 全部内嵌前端页面）
+├── HTTPS 文件服务.py        # 主程序
+├── 生成SSL证书.py        # 生成自签名证书，仅首次需运行
+├── 启动.bat        # 程序入口
 ├── LICENSE        # MIT 开源协议
 └── .gitignore     # 项目忽略规则
 ```
@@ -46,7 +48,8 @@ pip install cryptography
 
 ### 启动服务
 ```bash
-python main.py
+python 生成SSL证书.py
+python HTTPS 文件服务.py
 ```
 
 ### 访问地址
