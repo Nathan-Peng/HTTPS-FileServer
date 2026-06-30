@@ -90,3 +90,13 @@ python HTTPS 文件服务.py
 
 ## 📄 开源协议
 基于 [MIT License](LICENSE) 开源，可自由使用、修改与分发。
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=Nathan-Peng%2FHTTPS-FileServer&type=timeline&logscale=&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Nathan-Peng/HTTPS-FileServer&type=timeline&theme=dark&logscale&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Nathan-Peng/HTTPS-FileServer&type=timeline&logscale&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Nathan-Peng/HTTPS-FileServer&type=timeline&logscale&legend=top-left" />
+ </picture>
+</a>
