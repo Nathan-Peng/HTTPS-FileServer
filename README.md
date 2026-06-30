@@ -4,7 +4,8 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
 ![Auto-SSL](https://img.shields.io/badge/SSL-Auto%20Generate-success)
-![Version](https://img.shields.io/badge/Version-v6.5-Inline-orange)
+![Version](https://img.shields.io/badge/Version-v6.5-Inline)
+
 
 轻量、安全、开箱即用的**纯 Python 局域网 HTTPS 文件服务**。  
 无 OpenSSL 依赖、无需静态页面、单文件部署、自动生成 SSL 证书，适合内网设备互传、资源托管、私有文件共享。
